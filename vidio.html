@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Responsive Premium FluidPlayer Video</title>
+
+<link rel="stylesheet" href="https://cdn.fluidplayer.com/v3/current/fluidplayer.min.css">
+
+<style>
+/* Reset & body */
+body {
+  margin: 0;
+  padding: 0;
+  background: #000;
+  font-family: 'Arial', sans-serif;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+}
+
+/* Player container */
+#player-box {
+  width: 100%;
+  max-width: 1600px;
+  margin: 0 auto;
+  position: relative;
+  background: #111;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 15px 50px rgba(0,0,0,0.8);
+}
+
+/* Video fills container responsively */
+#player-box video {
+  width: 100%;
+  height: auto;          /* Maintain aspect ratio */
+  max-height: 99vh;      /* Fits almost full screen */
+  display: block;
+  background: #000;
+  object-fit: contain;   /* Ensures full video visible without cropping */
+}
+
+/* FluidPlayer custom colors */
+.fp-controls {
+  background: rgba(0,0,0,0.6) !important;
+}
+.fp-controls button.fp-playpause {
+  color: #1ab188 !important;
+}
+.fp-timeline .fp-played {
+  background: #1ab188 !important;
+}
+</style>
+</head>
+<body>
+
+<div id="player-box">
+    <video id="video" controls poster="" playsinline webkit-playsinline autoplay muted>
+      <source id="vsrc" src="" type="">
+    </video>
+</div>
+
+<script src="https://cdn.fluidplayer.com/v3/current/fluidplayer.min.js"></script>
+
+<script>
+/* ---------- PARAMETER FUNCTION ---------- */
+function getParam(k){
+  return new URL(location.href).searchParams.get(k);
+}
+
+let provider = getParam("provider");
+let format   = getParam("format");
+let id       = getParam("link");
+let poster   = getParam("poster");
+
+let file="";
+
+/* ---------- PROVIDER LOGIC ---------- */
+if(provider==="gdrive"){
+ file = `https://www.googleapis.com/drive/v3/files/${id}?alt=media&key=AIzaSyAjHmFEgW0hl51EzKfROSpdJ5Vf8K7DzPA`;
+}
+
+/* ---------- SET VIDEO SOURCE & POSTER ---------- */
+document.getElementById("vsrc").src = file;
+document.getElementById("vsrc").type = format;
+document.getElementById("video").poster = poster;
+
+/* ---------- INITIALIZE FLUIDPLAYER ---------- */
+fluidPlayer("video", {
+    layoutControls: {
+        autoPlay: true,
+        fillToContainer: true,  // Fill container
+        playPauseAnimation: true,
+        allowDownload: false,
+        primaryColor: "#1ab188",
+        playButtonShowing: true,
+        remainingTime: true,
+        fullscreen: true,
+        volume: 'vertical'
+    },
+    vastOptions: {
+        adList: []
+    }
+});
+
+/* ---------- AUTOPLAY FALLBACK ---------- */
+document.getElementById("video").play().catch(function(err){
+    console.log("Autoplay blocked, muted fallback:", err);
+});
+</script>
+
+</body>
+</html>
