@@ -4,7 +4,6 @@
   <meta charset="UTF-8">
   <title>Redirecting...</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
   <style>
     body {
       margin: 0;
@@ -13,62 +12,56 @@
       justify-content: center;
       align-items: center;
       font-family: Arial, sans-serif;
-      background: #f2f2f2;
+      background: #f4f4f4;
     }
   </style>
 </head>
-
 <body>
   <h2>Wait while redirecting...</h2>
 
   <script>
-    /******** SETTINGS ********/
-    const CLICK_CODE = "wen25tvh";   // change if needed
-    const REDIRECT_DELAY = 800;      // ms
+    /************** SETTINGS **************/
+    const CLICK_CODE = "wen25tvh";        // campaign / click code
+    const REDIRECT_DELAY = 800;           // ms
 
-    /******** TRACKING ********/
-    function track(event) {
-      console.log("[TRACK]", event);
+    /************** HELPER FUNCTIONS **************/
+    function track(eventName, data = {}) {
+      console.log("[TRACK]", eventName, data);
+      // Optional: send to server via fetch/beacon
     }
 
-    /******** REDIRECT URL ********/
-    function buildRedirectUrl() {
+    function getRedirectUrl() {
       const url = new URL(window.location.href);
       const domain = url.searchParams.get("domain");
       const z = url.searchParams.get("z");
 
-      if (!domain || !z) {
-        return "https://gooe.com";
-      }
+      if (!domain || !z) return "https://containersite.github.io/au/?domain=offer.com&z=12345
+";
 
       return `https://${domain}/${CLICK_CODE}/${z}${url.search}`;
     }
 
-    const redirectUrl = buildRedirectUrl();
+    /************** MAIN LOGIC **************/
+    const redirectUrl = getRedirectUrl();
 
-    /******** PAGE LOAD ********/
-    track("page_load");
+    // Track page load
+    track("page_load", { from: document.referrer });
 
-    // history hijack
-    history.pushState({ trapped: true }, "", location.href);
-
-    // initial redirect
+    // Delay redirect to simulate "loading"
     setTimeout(() => {
-      track("redirect_page_load");
-      window.location.replace(redirectUrl);
+      track("redirect", { type: "page_load" });
+
+      // ✅ Use href to preserve Page1 in history
+      window.location.href = redirectUrl;
+
     }, REDIRECT_DELAY);
 
-    /******** BACK BUTTON ********/
-    window.addEventListener("popstate", function () {
-      track("back_button");
-
-      history.pushState({ trapped: true }, "", location.href);
-
-      setTimeout(() => {
-        track("redirect_back");
-        window.location.replace(redirectUrl);
-      }, 300);
-    });
+    /************** Optional: Page3 Back Handling **************/
+    // If you need special back behavior on Page3, you can add popstate listener
+    // window.addEventListener("popstate", function () {
+    //   track("back_button", {});
+    //   // let browser naturally go back to Page1
+    // });
   </script>
 </body>
 </html>
